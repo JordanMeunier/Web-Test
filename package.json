@@ -4,8 +4,9 @@
   "description": "Site web local d'affichage de posts avec images et utilisateurs",
   "main": "src/index.js",
   "scripts": {
+    "build": "cd qwik && npm run build",
     "start": "node src/index.js",
-    "import": "node import/import.js"
+    "dev": "npm run build && npm run start"
   },
   "dependencies": {
     "axios": "^1.9.0",
