@@ -1,4 +1,4 @@
-const user_query = require('./user.query');
+const user_query = require('./users.query');
 const posts_query = require('../posts/posts.query');
 const auth = require('../../middleware/auth');
 
