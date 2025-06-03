@@ -4,7 +4,9 @@ const jwt = require('jsonwebtoken');
 
 exports.check_account_mail = function(res, mail, callback) {
     const normalizedMail = mail.toLowerCase().trim();
-    db.query('SELECT * FROM user WHERE email = ?', [normalizedMail], function(err, results) {
+    db.query('SELECT * FROM user WHERE email = ?',
+        [normalizedMail],
+        function(err, results) {
         if (err) return res.status(500).json({ msg: 'Internal server error' });
         if (results.length > 0) {
             callback(84);
@@ -15,9 +17,13 @@ exports.check_account_mail = function(res, mail, callback) {
 };
 
 exports.get_mail_account = function(res, mail, pwd, bcrypt, callback) {
-    db.query('SELECT id, password FROM user WHERE email = ?', [mail], function(err, results) {
-        if (err) return res.status(500).json({ msg: 'Internal server error' });
-        if (results.length === 0) return callback(84);
+    db.query('SELECT id, password FROM user WHERE email = ?',
+        [mail],
+        function(err, results) {
+        if (err)
+            return res.status(500).json({ msg: 'Internal server error' });
+        if (results.length === 0)
+            return callback(84);
         const hash = results[0].password;
         const id = results[0].id;
         if (bcrypt.compareSync(pwd, hash)) {
@@ -35,7 +41,8 @@ exports.register = function(res, mail, pwd, uname) {
         'INSERT INTO user (username, password, email) VALUES (?, ?, ?)',
         [uname, pwd, mail],
         function(err) {
-            if (err) return res.status(500).json({ msg: 'Internal server error' });
+            if (err)
+                return res.status(500).json({ msg: 'Internal server error' });
             const token = jwt.sign({ email: mail }, 'SECRET');
             res.status(201).json({ token });
         }
@@ -43,7 +50,8 @@ exports.register = function(res, mail, pwd, uname) {
 };
 
 exports.get_all_users = function(res) {
-    db.query('SELECT * FROM user', function(err, users) {
+    db.query('SELECT * FROM user',
+        function(err, users) {
         if (err) {
             return res.status(500).json({ msg: 'Internal server error' });
         } else if (users.length > 0) {
@@ -55,14 +63,20 @@ exports.get_all_users = function(res) {
 };
 
 exports.get_user_info = function(info, res) {
-    db.query('SELECT * FROM user WHERE email = ?', [info], function(err, resultsByEmail) {
-        if (err) return res.status(500).json({ msg: 'Internal server error' });
+    db.query('SELECT * FROM user WHERE email = ?',
+        [info],
+        function(err, resultsByEmail) {
+        if (err)
+            return res.status(500).json({ msg: 'Internal server error' });
         if (resultsByEmail.length > 0) {
             return res.status(200).json(resultsByEmail[0]);
         }
 
-        db.query('SELECT * FROM user WHERE id = ?', [info], function(err, resultsById) {
-            if (err) return res.status(500).json({ msg: 'Internal server error' });
+        db.query('SELECT * FROM user WHERE id = ?',
+            [info],
+            function(err, resultsById) {
+            if (err)
+                return res.status(500).json({ msg: 'Internal server error' });
             if (resultsById.length > 0) {
                 return res.status(200).json(resultsById[0]);
             }
@@ -73,8 +87,11 @@ exports.get_user_info = function(info, res) {
 
 exports.update_user = function(email, password, username, id, res) {
     const hash = bcrypt.hashSync(password, 10);
-    db.query('SELECT * FROM user WHERE id = ?', [id], function(err, results) {
-        if (err) return res.status(500).json({ msg: 'Internal server error' });
+    db.query('SELECT * FROM user WHERE id = ?',
+        [id],
+        function(err, results) {
+            return res.status(500).json({ msg: 'Internal server error' });
+        if (err)
         if (results.length === 0)
             return res.status(404).json({ msg: 'User not found' });
 
