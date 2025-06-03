@@ -11,6 +11,22 @@ router.get('/', auth, (req, res) => {
     });
 });
 
+router.get('/:id', auth, (req, res) => {
+    post.get_post_details(req.params.id, (err, postDetails) => {
+        if (err)
+            return res.status(500).json({ msg: 'Internal server error' });
+        if (!postDetails)
+            return res.status(404).json({ msg: 'Post not found' });
+        postDetails.user_link = `/user/${postDetails.user_id}`;
+        postDetails.comments = postDetails.comments.map(comment => ({
+            ...comment,
+            user_link: `/user/${comment.user_id}`
+        }));
+
+        res.json(postDetails);
+    });
+});
+
 router.post('/', auth, (req, res) => {
     const { title, body, image_url } = req.body;
     if (!title || !body || !image_url)
@@ -52,7 +68,7 @@ router.put('/:id', auth, (req, res) => {
 });
 
 router.delete('/:id', auth, (req, res) => {
-    post.delete_post(req.params.id, (err, result) => {
+    post.deletePost(req.params.id, (err, result) => {
         if (err)
             return res.status(500).json({ msg: 'Internal server error' });
         if (result.affectedRows === 0)
@@ -60,4 +76,5 @@ router.delete('/:id', auth, (req, res) => {
         res.json({ msg: `Successfully deleted record number : ${req.params.id}` });
     });
 });
+
 module.exports = router;
