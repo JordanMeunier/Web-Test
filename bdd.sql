@@ -1,0 +1,19 @@
+CREATE DATABASE IF NOT EXISTS bdd;
+
+USE bdd;
+
+CREATE TABLE IF NOT EXISTS user (
+    id INT PRIMARY KEY,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    username VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS post (
+    id INT PRIMARY KEY,
+    user_id INT NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    body TEXT NOT NULL,
+    image_url VARCHAR(255),
+    FOREIGN KEY (user_id) REFERENCES user(id)
+);
