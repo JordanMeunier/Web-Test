@@ -3,7 +3,8 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 exports.check_account_mail = function(res, mail, callback) {
-    db.query('SELECT * FROM user WHERE email = ?', [mail], function(err, results) {
+    const normalizedMail = mail.toLowerCase().trim();
+    db.query('SELECT * FROM user WHERE email = ?', [normalizedMail], function(err, results) {
         if (err) return res.status(500).json({ msg: 'Internal server error' });
         if (results.length > 0) {
             callback(84);
@@ -32,7 +33,7 @@ exports.get_mail_account = function(res, mail, pwd, bcrypt, callback) {
 exports.register = function(res, mail, pwd, uname) {
     db.query(
         'INSERT INTO user (username, password, email) VALUES (?, ?, ?)',
-        [mail, pwd, uname],
+        [uname, pwd, mail],
         function(err) {
             if (err) return res.status(500).json({ msg: 'Internal server error' });
             const token = jwt.sign({ email: mail }, 'SECRET');
@@ -55,37 +56,37 @@ exports.get_all_users = function(res) {
 
 exports.get_user_info = function(info, res) {
     db.query('SELECT * FROM user WHERE email = ?', [info], function(err, resultsByEmail) {
-        if (err) {
-            return res.status(500).json({ msg: 'Internal server error' });
-        } else if (resultsByEmail.length > 0) {
+        if (err) return res.status(500).json({ msg: 'Internal server error' });
+        if (resultsByEmail.length > 0) {
             return res.status(200).json(resultsByEmail[0]);
-        } else {
-            db.query('SELECT * FROM user WHERE id = ?', [info], function(err, resultsById) {
-                if (err) {
-                    return res.status(500).json({ msg: 'Internal server error' });
-                } else if (resultsById.length > 0) {
-                    return res.status(200).json(resultsById[0]);
-                } else {
-                    return res.status(400).json({ msg: 'Not found' });
-                }
-            });
         }
+
+        db.query('SELECT * FROM user WHERE id = ?', [info], function(err, resultsById) {
+            if (err) return res.status(500).json({ msg: 'Internal server error' });
+            if (resultsById.length > 0) {
+                return res.status(200).json(resultsById[0]);
+            }
+            return res.status(404).json({ msg: 'User not found' });
+        });
     });
 };
 
 exports.update_user = function(email, password, username, id, res) {
     const hash = bcrypt.hashSync(password, 10);
-    db.query(
-        'UPDATE user SET email = ?, password = ?, username = ? WHERE id = ?',
-        [email, hash, username, id],
-        function(err) {
-            if (err) {
-                return res.status(500).json({ msg: 'Internal server error' });
-            } else {
+    db.query('SELECT * FROM user WHERE id = ?', [id], function(err, results) {
+        if (err) return res.status(500).json({ msg: 'Internal server error' });
+        if (results.length === 0)
+            return res.status(404).json({ msg: 'User not found' });
+
+        db.query(
+            'UPDATE user SET email = ?, password = ?, username = ? WHERE id = ?',
+            [email, hash, username, id],
+            function(err) {
+                if (err) return res.status(500).json({ msg: 'Internal server error' });
                 exports.get_user_info(id, res);
             }
-        }
-    );
+        );
+    });
 };
 
 exports.delete_user = function(res, id) {
