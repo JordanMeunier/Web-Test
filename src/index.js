@@ -1,16 +1,30 @@
 const express = require('express');
+const path = require('path');
 const notFound = require('./middleware/notFound');
-const app = express();
-app.use(express.json());
-app.use(notFound);
 require('dotenv').config();
-const user_routes = require('./routes/users/users');
-const post_routes = require('./routes/posts/posts');
-const auth_routes = require('./routes/auth/auth');
-app.use('/users', user_routes);
-app.use('/posts', post_routes);
-auth_routes(app, require('bcryptjs'));
+
+const app = express();
+
+app.use(express.json());
+
+const userRoutes = require('./routes/users/users');
+const postRoutes = require('./routes/posts/posts');
+const authRoutes = require('./routes/auth/auth');
+
+app.use('/users', userRoutes);
+app.use('/posts', postRoutes);
+authRoutes(app, require('bcryptjs'));
+
+const publicDir = path.join(__dirname, 'public');
+app.use(express.static(publicDir));
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(publicDir, 'index.html'));
+});
+
+app.use(notFound);
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(`Server is running on http://localhost:${PORT}`);
 });
