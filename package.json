@@ -1,0 +1,31 @@
+{
+  "name": "web-test",
+  "version": "1.0.0",
+  "description": "Site web local d'affichage de posts avec images et utilisateurs",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "import": "node import/import.js"
+  },
+  "dependencies": {
+    "axios": "^1.9.0",
+    "bcrypt": "^6.0.0",
+    "bcryptjs": "^3.0.2",
+    "body-parser": "^2.2.0",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.14.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JordanMeunier/Web-Test.git"
+  },
+  "bugs": {
+    "url": "https://github.com/JordanMeunier/Web-Test/issues"
+  },
+  "homepage": "https://github.com/JordanMeunier/Web-Test#readme",
+  "keywords": [],
+  "author": "Jordan Meunier",
+  "license": "ISC"
+}
