@@ -90,8 +90,8 @@ exports.update_user = function(email, password, username, id, res) {
     db.query('SELECT * FROM user WHERE id = ?',
         [id],
         function(err, results) {
-            return res.status(500).json({ msg: 'Internal server error' });
         if (err)
+            return res.status(500).json({ msg: 'Internal server error' });
         if (results.length === 0)
             return res.status(404).json({ msg: 'User not found' });
 
