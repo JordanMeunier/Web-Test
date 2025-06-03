@@ -63,25 +63,17 @@ exports.get_all_users = function(res) {
 };
 
 exports.get_user_info = function(info, res) {
-    db.query('SELECT * FROM user WHERE email = ?',
+    const isEmail = info.includes('@');
+    const query = isEmail ? 'SELECT * FROM user WHERE email = ?' : 'SELECT * FROM user WHERE id = ?';
+    
+    db.query(query,
         [info],
-        function(err, resultsByEmail) {
+        function(err, results) {
         if (err)
             return res.status(500).json({ msg: 'Internal server error' });
-        if (resultsByEmail.length > 0) {
-            return res.status(200).json(resultsByEmail[0]);
-        }
-
-        db.query('SELECT * FROM user WHERE id = ?',
-            [info],
-            function(err, resultsById) {
-            if (err)
-                return res.status(500).json({ msg: 'Internal server error' });
-            if (resultsById.length > 0) {
-                return res.status(200).json(resultsById[0]);
-            }
+        if (results.length === 0)
             return res.status(404).json({ msg: 'User not found' });
-        });
+        return res.status(200).json(results[0]);
     });
 };
 
